@@ -4,10 +4,8 @@ import com.automak_sensors.automak_temperature_monitoring.api.model.SensorMonito
 import com.automak_sensors.automak_temperature_monitoring.domain.repository.SensorMonitoringRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/sensors/{sensorId}/monitoring")
@@ -28,4 +26,24 @@ public class SensorMonitoringController {
                 .orElseThrow(() -> new RuntimeException("Sensor monitoring not found for id: " + sensorId));
     }
 
+    @PutMapping("/enable")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void enableSensorMonitoring(@PathVariable String sensorId) {
+        sensorMonitoringRepository.findById(sensorId)
+                .ifPresent(sensorMonitoring -> {
+                    sensorMonitoring.setEnabled(true);
+                    sensorMonitoringRepository.save(sensorMonitoring);
+                });
+    }
+
+
+    @DeleteMapping("/disable")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void disableSensorMonitoring(@PathVariable String sensorId) {
+        sensorMonitoringRepository.findById(sensorId)
+                .ifPresent(sensorMonitoring -> {
+                    sensorMonitoring.setEnabled(false);
+                    sensorMonitoringRepository.save(sensorMonitoring);
+                });
+    }
 }
